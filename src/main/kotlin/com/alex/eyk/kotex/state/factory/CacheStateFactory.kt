@@ -53,6 +53,7 @@ internal constructor() : StateFactory<CharSequence, S> {
         try {
             writeLock.lock()
             if (stateCache.contains(key)) {
+                stateCache[key]?.close()
                 stateCache.remove(key)
             }
         } finally {
