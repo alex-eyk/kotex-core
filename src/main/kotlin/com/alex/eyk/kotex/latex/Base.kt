@@ -1,13 +1,14 @@
 package com.alex.eyk.kotex.latex
 
 import com.alex.eyk.kotex.state.MultiState
+import com.alex.eyk.kotex.state.TempFilesState
 import com.alex.eyk.kotex.state.factory.CacheStateFactory
 import com.alex.eyk.kotex.state.factory.StateFactory
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.currentCoroutineContext
 import java.io.File
 
-private val stateFactory: StateFactory<CharSequence, MultiState<Iterable<File>>> =
+private val multiStateFactory: StateFactory<CharSequence, MultiState<Iterable<File>>> =
     CacheStateFactory()
 
 /**
@@ -23,12 +24,70 @@ private val stateFactory: StateFactory<CharSequence, MultiState<Iterable<File>>>
 suspend fun RawContent(
     content: CharSequence
 ) {
-    getCurrentState()
+    coroutineState()
         .append(rawContent = content)
 }
 
-internal suspend fun getCurrentState(): MultiState<Iterable<File>> {
-    val name = (currentCoroutineContext()[CoroutineName.Key]
-            as CoroutineName).name
-    return stateFactory.get(key = name)
+@LaTeX
+suspend fun Input(
+    target: CharSequence
+) {
+    RawContent(
+        content = "\\input{$target}" + System.lineSeparator()
+    )
+}
+
+@LaTeX
+internal suspend fun Tag(
+    tag: String
+) {
+    coroutineState()
+        .setTag(tag)
+}
+
+internal fun registerDocument(
+    name: String
+) {
+    assertName(name)
+    multiStateFactory.put(
+        name, TempFilesState(name)
+    )
+}
+
+internal fun removeDocument(
+    name: String
+) {
+    if (multiStateFactory.contains(key = name)) {
+        multiStateFactory.remove(name)
+    }
+}
+
+internal suspend fun currentTag(): String {
+    return coroutineState()
+        .getTag()
+        .toString()
+}
+
+internal suspend fun currentContent(): Iterable<File> {
+    return coroutineState()
+        .getContent()
+}
+
+internal suspend fun coroutineState(): MultiState<Iterable<File>> {
+    currentCoroutineContext()[CoroutineName.Key]?.let {
+        return multiStateFactory.get(it.name)
+    } ?: throw IllegalStateException(
+        "Unable to get document name from coroutine context. Check that @LaTeX functions " +
+                "are called only in the correct context."
+    )
+}
+
+private fun assertName(
+    name: String
+) {
+    if (multiStateFactory.contains(key = name)) {
+        throw IllegalArgumentException(
+            "Document or block with name: $name is already exists."
+        )
+    }
 }
