@@ -27,8 +27,9 @@ class TempFilesState(
 
     init {
         val directory = File(tempPath)
-        directory.mkdirs().assertSuccess()
-
+        if (!directory.exists()) {
+            directory.mkdirs().assertSuccess()
+        }
         addTagIfNecessary(PREAMBLE)
         addTagIfNecessary(name)
     }
@@ -36,7 +37,10 @@ class TempFilesState(
     override fun append(
         rawContent: CharSequence,
     ) {
-        writersCache[tag]?.write(rawContent.toString())
+        writersCache[tag]?.let {
+            it.write(rawContent.toString())
+            it.flush()
+        }
     }
 
     override fun getTag() = tag
