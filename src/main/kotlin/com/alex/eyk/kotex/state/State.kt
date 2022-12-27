@@ -1,6 +1,8 @@
 package com.alex.eyk.kotex.state
 
-interface State<T> {
+import java.io.Closeable
+
+interface State<T> : Closeable {
 
     fun append(
         rawContent: CharSequence
