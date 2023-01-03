@@ -12,7 +12,7 @@ object PathUtils {
     private val JAR_PATH_REGEX = Regex(pattern = "file:[A-Za-z]:.*")
 
     fun getJarDirectoryPath(
-        class_: Class<*>
+        class_: Class<*> = PathUtils.javaClass
     ): String {
         val jarLocation = getJarLocation(class_)
         val file = urlToFile(jarLocation)
