@@ -28,17 +28,24 @@ suspend fun RawContent(
         .append(rawContent = content)
 }
 
+/**
+ * LaTeX processes the file as if its contents were inserted in the current
+ * file.
+ * If filename does not end in ‘.tex’ then LaTeX first tries the filename
+ * with that extension; this is the usual case. If filename ends with ‘.tex’
+ * then LaTeX looks for the filename as it is.
+ */
 @LaTeX
-suspend fun Input(
-    target: CharSequence
+suspend inline fun Input(
+    filename: CharSequence
 ) {
     RawContent(
-        content = "\\input{$target}" + System.lineSeparator()
+        content = "\\input{$filename}" + System.lineSeparator()
     )
 }
 
 @LaTeX
-internal suspend fun Tag(
+internal suspend inline fun Tag(
     tag: String
 ) {
     coroutineState()
