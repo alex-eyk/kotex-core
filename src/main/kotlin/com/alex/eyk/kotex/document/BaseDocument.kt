@@ -1,9 +1,11 @@
 package com.alex.eyk.kotex.document
 
+import com.alex.eyk.kotex.latex.Input
 import com.alex.eyk.kotex.latex.LaTeX
 import com.alex.eyk.kotex.latex.Tag
 import com.alex.eyk.kotex.latex.currentContent
 import com.alex.eyk.kotex.latex.currentTag
+import com.alex.eyk.kotex.state.TempFilesState
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -11,10 +13,21 @@ import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
 
 open class BaseDocument(
-    name: String
+    name: String,
+    private val multiDeclareAllowed: Boolean = false
 ) : AbstractDocument<Iterable<File>>(name) {
 
     private val stateLockMap: MutableMap<String, Lock> = HashMap()
+    private val declaredTags: MutableSet<String> = HashSet()
+
+    companion object {
+
+        const val PREAMBLE = TempFilesState.PREAMBLE
+    }
+
+    init {
+        declare(PREAMBLE)
+    }
 
     override fun append(
         content: @LaTeX suspend () -> Unit
@@ -30,20 +43,28 @@ open class BaseDocument(
         }
     }
 
-    override fun declare(
+    final override fun declare(
         tag: String
     ) {
-        append(
-            tag = tag,
-            content = {}
-        )
+        if (multiDeclareAllowed || tag !in declaredTags) {
+            append {
+                Input(tag)
+                declaredTags.add(tag)
+            }
+        } else {
+            throw IllegalStateException("Tag $tag already declared")
+        }
     }
 
     override fun append(
         tag: String,
+        declareImmediately: Boolean,
         content: @LaTeX suspend () -> Unit
     ) {
         append {
+            if (declareImmediately) {
+                declare(tag)
+            }
             val lastTag = currentTag()
             Tag(tag)
             content()

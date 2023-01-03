@@ -43,13 +43,14 @@ abstract class AbstractDocument<C>(
         content: @LaTeX suspend () -> Unit
     )
 
-    abstract fun declare(
-        tag: String
-    )
-
     abstract fun append(
         tag: String,
+        declareImmediately: Boolean = true,
         content: @LaTeX suspend () -> Unit
+    )
+
+    abstract fun declare(
+        tag: String
     )
 
     abstract suspend fun getContent(): C
