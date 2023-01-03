@@ -1,13 +1,15 @@
 package com.alex.eyk.kotex.state
 
+import com.alex.eyk.kotex.util.FileUtils
 import com.alex.eyk.kotex.util.PathUtils.getJarDirectoryPath
+import com.alex.eyk.kotex.util.assertSuccess
 import java.io.File
 import java.io.FileWriter
 import java.io.Writer
 
-class TempFilesState(
+internal class TempFilesState(
     name: String,
-    path: String = getJarDirectoryPath(class_ = this::class.java),
+    path: String = getJarDirectoryPath(),
     private val deleteSourceOnClose: Boolean = false
 ) : MultiState<Iterable<File>>, FileState<Iterable<File>> {
 
@@ -15,7 +17,7 @@ class TempFilesState(
 
         private const val TEMP_DIRECTORY = "temp"
 
-        const val PREAMBLE = "preamble"
+        internal const val PREAMBLE = "preamble"
     }
 
     private val tempPath = "$path/$name/$TEMP_DIRECTORY"
@@ -85,22 +87,9 @@ class TempFilesState(
         val path = "$tempPath/$tag.tex"
         val file = File(path)
         if (file.exists()) {
-            val copy = File("$path.bak")
-            file.copyTo(
-                target = copy,
-                overwrite = true
-            )
-            file.delete().assertSuccess()
+            FileUtils.deleteWithBackup(file)
         }
         file.createNewFile().assertSuccess()
         this.files[tag] = file
-    }
-
-    private fun Boolean.assertSuccess() {
-        if (!this) {
-            throw IllegalStateException(
-                "Unable to complete action with file"
-            )
-        }
     }
 }
