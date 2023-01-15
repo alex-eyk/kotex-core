@@ -1,5 +1,6 @@
 package com.alex.eyk.kotex.latex
 
+import com.alex.eyk.kotex.entity.Package
 import com.alex.eyk.kotex.state.MultiState
 import com.alex.eyk.kotex.state.TempFilesState
 import com.alex.eyk.kotex.state.factory.CacheStateFactory
@@ -10,23 +11,6 @@ import java.io.File
 
 private val multiStateFactory: StateFactory<CharSequence, MultiState<Iterable<File>>> =
     CacheStateFactory()
-
-/**
- * Basic LaTeX block content state management function. Every LaTeX function
- * eventually necessarily calls this function to add 'raw' content.
- *
- * Thus, a function annotated with @LaTeX annotation converts some input data
- * into LaTeX content and calls that function.
- *
- * @param content LaTeX code to be added to the current block.
- */
-@LaTeX
-suspend fun RawContent(
-    content: CharSequence
-) {
-    coroutineState()
-        .append(rawContent = content)
-}
 
 /**
  * LaTeX processes the file as if its contents were inserted in the current
@@ -45,11 +29,60 @@ suspend inline fun Input(
 }
 
 @LaTeX
+suspend fun IncludePackage(
+    package_: Package
+) {
+    val tag = currentTag()
+    Tag(TempFilesState.PREAMBLE)
+    UsePackage(package_)
+    Tag(tag)
+}
+
+@LaTeX
+suspend fun IncludePackages(
+    packages: List<Package>
+) {
+    val tag = currentTag()
+    Tag(TempFilesState.PREAMBLE)
+    packages.forEach {
+        UsePackage(it)
+    }
+    Tag(tag)
+}
+
+@LaTeX
+internal suspend inline fun UsePackage(
+    package_: Package
+) {
+    RawContent(
+        content = "\\usepackage${package_.options.asOptionsString()}{${package_.name}}" +
+                System.lineSeparator()
+    )
+}
+
+@LaTeX
 internal suspend inline fun Tag(
     tag: String
 ) {
     coroutineState()
         .setTag(tag)
+}
+
+/**
+ * Basic LaTeX block content state management function. Every LaTeX function
+ * eventually necessarily calls this function to add 'raw' content.
+ *
+ * Thus, a function annotated with @LaTeX annotation converts some input data
+ * into LaTeX content and calls that function.
+ *
+ * @param content LaTeX code to be added to the current block.
+ */
+@LaTeX
+suspend fun RawContent(
+    content: CharSequence
+) {
+    coroutineState()
+        .append(rawContent = content)
 }
 
 internal fun registerDocument(
