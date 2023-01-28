@@ -1,6 +1,6 @@
 package com.alex.eyk.kotex.latex
 
-import com.alex.eyk.kotex.util.removeLast
+import com.alex.eyk.kotex.ext.removeLast
 
 internal fun String.withBracesOrEmpty(): String {
     return if (this.isEmpty()) "" else "{$this}"

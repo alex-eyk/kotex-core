@@ -1,4 +1,4 @@
-package com.alex.eyk.kotex.util
+package com.alex.eyk.kotex.ext
 
 private const val START_INDEX = 0
 

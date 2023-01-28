@@ -9,8 +9,8 @@ internal class BaseTest {
     fun rawContentTest() {
         assertLaTeX(
             content = {
-                RawContent(
-                    content = "Test text"
+                Content(
+                    raw = "Test text"
                 )
             },
             assert = {
@@ -19,7 +19,8 @@ internal class BaseTest {
                     actual = it.size
                 )
                 assertEquals(
-                    expected = "Test text",
+                    expected = "\\input{preamble}\n" +
+                            "Test text",
                     actual = it["document"]
                 )
             }

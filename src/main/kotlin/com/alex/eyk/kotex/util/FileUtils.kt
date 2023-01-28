@@ -1,5 +1,6 @@
 package com.alex.eyk.kotex.util
 
+import com.alex.eyk.kotex.ext.assertSuccess
 import java.io.File
 
 object FileUtils {

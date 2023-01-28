@@ -3,7 +3,7 @@ package com.alex.eyk.kotex.compiler
 import com.alex.eyk.kotex.document.AbstractDocument
 import com.alex.eyk.kotex.util.FileUtils
 import com.alex.eyk.kotex.util.PathUtils.getJarDirectoryPath
-import com.alex.eyk.kotex.util.assertSuccess
+import com.alex.eyk.kotex.ext.assertSuccess
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File

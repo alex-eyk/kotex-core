@@ -1,5 +1,8 @@
 package com.alex.eyk.kotex.entity
 
+/**
+ * External packages that extend the possibilities of latex.
+ */
 data class Package(
     val name: CharSequence,
     val options: List<String> = emptyList()

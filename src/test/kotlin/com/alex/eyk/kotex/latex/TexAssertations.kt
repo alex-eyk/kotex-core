@@ -23,14 +23,12 @@ private fun readContent(
 ): Map<String, String> {
     val contentMap = HashMap<String, String>()
     files.forEach { file ->
-        val contentBuilder = StringBuilder()
         file.inputStream()
             .bufferedReader()
             .use { reader ->
-                contentBuilder.append(reader.readLine())
+                val tag = file.name.removeSuffix(".tex")
+                contentMap[tag] = reader.readText()
             }
-        val tag = file.name.removeSuffix(".tex")
-        contentMap[tag] = contentBuilder.toString()
     }
     return contentMap
 }

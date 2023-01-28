@@ -5,7 +5,7 @@ import com.alex.eyk.kotex.state.MultiState
 import com.alex.eyk.kotex.state.TempFilesState
 import com.alex.eyk.kotex.state.factory.CacheStateFactory
 import com.alex.eyk.kotex.state.factory.StateFactory
-import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.CoroutineName.Key
 import kotlinx.coroutines.currentCoroutineContext
 import java.io.File
 
@@ -15,76 +15,150 @@ private val multiStateFactory: StateFactory<CharSequence, MultiState<Iterable<Fi
 /**
  * LaTeX processes the file as if its contents were inserted in the current
  * file.
+ *
  * If filename does not end in ‘.tex’ then LaTeX first tries the filename
  * with that extension; this is the usual case. If filename ends with ‘.tex’
  * then LaTeX looks for the filename as it is.
+ *
+ * @param filename name of the file whose contents will be included in the
+ * document.
  */
 @LaTeX
-suspend inline fun Input(
+suspend fun Input(
     filename: CharSequence
 ) {
-    RawContent(
-        content = "\\input{$filename}" + System.lineSeparator()
+    Content(
+        raw = "\\input{$filename}" + System.lineSeparator()
     )
 }
 
+/**
+ * A function that adds a declaration of the use of an external packages to
+ * the beginning of the [LaTeX] document.
+ *
+ * @param packages list of external packages to be used in the document.
+ */
 @LaTeX
-suspend fun IncludePackage(
-    package_: Package
-) {
-    val tag = currentTag()
-    Tag(TempFilesState.PREAMBLE)
-    UsePackage(package_)
-    Tag(tag)
-}
-
-@LaTeX
-suspend fun IncludePackages(
+suspend fun DeclareExternalPackages(
     packages: List<Package>
 ) {
-    val tag = currentTag()
-    Tag(TempFilesState.PREAMBLE)
+    packages.forEach {
+        DeclareExternalPackage(it)
+    }
+}
+
+/**
+ * A function that adds a declaration of the use of an external package to
+ * the beginning of the [LaTeX] document.
+ *
+ * @param package_ external package to be used in the document.
+ */
+@LaTeX
+suspend fun DeclareExternalPackage(
+    package_: Package
+) {
+    forTag(TempFilesState.PREAMBLE) {
+        UsePackage(package_)
+    }
+}
+
+/**
+ * Command that allows to use external packages that extend the capabilities
+ * of LaTeX. Should be in the preamble of the document.
+ *
+ * @param packages list of external packages to be used in the document.
+ */
+@LaTeX
+suspend fun UsePackages(
+    packages: List<Package>
+) {
     packages.forEach {
         UsePackage(it)
     }
-    Tag(tag)
 }
 
+/**
+ * Command that allows to use external package that extend the capabilities
+ * of LaTeX. Should be in the preamble of the document.
+ *
+ * @param package_ external package to be used in the document.
+ */
 @LaTeX
-internal suspend inline fun UsePackage(
+suspend fun UsePackage(
     package_: Package
 ) {
-    RawContent(
-        content = "\\usepackage${package_.options.asOptionsString()}{${package_.name}}" +
+    Content(
+        raw = "\\usepackage${package_.options.asOptionsString()}{${package_.name}}" +
                 System.lineSeparator()
     )
 }
 
+/**
+ * Every [LaTeX] function eventually necessarily calls this function to add
+ * relevant content to the document. Thus, a function annotated with [LaTeX]
+ * annotation converts input data into LaTeX content and calls that function.
+ *
+ * When the function is called, the content is added to some part of the
+ * final document. This part is set using a tag.
+ *
+ * [LaTeX] function must be called from a coroutine whose name is equal to
+ * the name of the currently edited document. Accordingly, each [LaTeX]
+ * function must contain a `suspend` modifier.
+ *
+ * @param raw [LaTeX] raw content to be added to the current document.
+ */
 @LaTeX
-internal suspend inline fun Tag(
-    tag: String
+suspend fun Content(
+    raw: CharSequence
 ) {
-    coroutineState()
+    documentState()
+        .append(raw)
+}
+
+/**
+ * Function that adds content to the [LaTeX] document for the specified tag.
+ * After adding this content, the tag will become the same as it was.
+ *
+ * @param tag tag that defines where the content will be added.
+ * @param content content to be added for the specified tag.
+ */
+internal suspend inline fun forTag(
+    tag: CharSequence,
+    content: @LaTeX () -> Unit
+) {
+    val was = currentTag()
+    setTag(tag)
+    content()
+    setTag(was)
+}
+
+/**
+ * Setting the tag allows you to set the place in the document where the
+ * content will be added: when [LaTeX] function is called, the content is
+ * added to some part of the final document, which is set using a tag.
+ *
+ * Content related to a specific tag will be located in the place where the
+ * tag first appeared.
+ *
+ * This approach allows, for example, to add the import of external packages
+ * to the preamble of the document, after declaring the corresponding tag at
+ * the beginning of the document.
+ *
+ * @param tag tag that defines where the content will be added.
+ */
+internal suspend fun setTag(
+    tag: CharSequence
+) {
+    documentState()
         .setTag(tag)
 }
 
 /**
- * Basic LaTeX block content state management function. Every LaTeX function
- * eventually necessarily calls this function to add 'raw' content.
+ * Function creates a new state of the document with the given name, which
+ * will later be changed and supplemented with content.
  *
- * Thus, a function annotated with @LaTeX annotation converts some input data
- * into LaTeX content and calls that function.
- *
- * @param content LaTeX code to be added to the current block.
+ * @param name name of the document without extensions. It must be unique.
  */
-@LaTeX
-suspend fun RawContent(
-    content: CharSequence
-) {
-    coroutineState()
-        .append(rawContent = content)
-}
-
 internal fun registerDocument(
     name: String
 ) {
@@ -94,6 +168,11 @@ internal fun registerDocument(
     )
 }
 
+/**
+ * A function that removes the document's state.
+ *
+ * @param name of the document without extensions.
+ */
 internal fun removeDocument(
     name: String
 ) {
@@ -103,22 +182,24 @@ internal fun removeDocument(
 }
 
 internal suspend fun currentTag(): String {
-    return coroutineState()
+    return documentState()
         .getTag()
         .toString()
 }
 
-internal suspend fun currentContent(): Iterable<File> {
-    return coroutineState()
+internal suspend fun documentContent(): Iterable<File> {
+    return documentState()
         .getContent()
 }
 
-internal suspend fun coroutineState(): MultiState<Iterable<File>> {
-    currentCoroutineContext()[CoroutineName.Key]?.let {
+internal suspend fun documentState(): MultiState<Iterable<File>> {
+    val key = currentCoroutineContext()[Key]
+    key?.let {
         return multiStateFactory.get(it.name)
     } ?: throw IllegalStateException(
         "Unable to get document name from coroutine context. Check that @LaTeX functions " +
-                "are called only in the correct context."
+                "are called only in the correct context and `registerDocument` function" +
+                "was called."
     )
 }
 

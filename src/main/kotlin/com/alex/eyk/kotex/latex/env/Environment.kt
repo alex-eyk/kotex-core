@@ -4,7 +4,7 @@ package com.alex.eyk.kotex.latex.env
 
 import com.alex.eyk.kotex.latex.LaTeX
 import com.alex.eyk.kotex.latex.LineBreak
-import com.alex.eyk.kotex.latex.RawContent
+import com.alex.eyk.kotex.latex.Content
 import com.alex.eyk.kotex.latex.asAdditionalArgumentsString
 import com.alex.eyk.kotex.latex.asAdditionalOptionsString
 import com.alex.eyk.kotex.latex.asOptionsString
@@ -92,12 +92,12 @@ suspend inline fun Wrapped(
     end: String,
     content: @LaTeX suspend () -> Unit
 ) {
-    RawContent(
-        content = start
+    Content(
+        raw = start
     )
     content()
-    RawContent(
-        content = end
+    Content(
+        raw = end
     )
 }
 
@@ -108,8 +108,8 @@ suspend fun EnvironmentBegin(
     additionalOptions: List<String> = emptyList(),
     arguments: List<String> = emptyList()
 ) {
-    RawContent(
-        content = blockBegin(name) +
+    Content(
+        raw = blockBegin(name) +
                 options.asOptionsString() +
                 additionalOptions.asAdditionalOptionsString() +
                 arguments.asAdditionalArgumentsString()
@@ -122,8 +122,8 @@ suspend fun EnvironmentEnd(
     name: String
 ) {
     LineBreak()
-    RawContent(
-        content = blockEnd(name)
+    Content(
+        raw = blockEnd(name)
     )
     LineBreak()
 }

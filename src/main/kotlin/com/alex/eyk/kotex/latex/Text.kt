@@ -1,6 +1,8 @@
 package com.alex.eyk.kotex.latex
 
+import com.alex.eyk.kotex.latex.command.Command
 import com.alex.eyk.kotex.latex.env.BraceWrapped
+import com.alex.eyk.kotex.util.plus
 
 /**
  * Modifiers to change the style of the text.
@@ -77,6 +79,69 @@ enum class Modifier(
 }
 
 /**
+ * A set of spaces of various sizes. Here are the most used options, but not
+ * all. If there is a need to use a different size, you can create your own
+ * latex function:
+ * ```
+ *  @LaTeX
+ *  fun CustomSpace() {
+ *      Command(
+ *          name = ","
+ *      )
+ *  }
+ * ```
+ */
+enum class SpaceSize(
+    val code: String
+) {
+
+    /**
+     * Equivalent of space size in normal text.
+     */
+    AS_SPACE(" "),
+
+    /**
+     * Space size equal to the current font size.
+     */
+    QUAD("quad"),
+
+    /**
+     * Size of [QUAD] twice.
+     */
+    QUAD_TWICE("qquad"),
+
+    /**
+     * 3/18 of [QUAD] size.
+     */
+    MINIMAL(","),
+
+
+    /**
+     * 4/18 of [QUAD] size.
+     */
+    SMALL(":"),
+
+    /**
+     * 5/18 of [QUAD] size.
+     */
+    MEDIUM(";")
+}
+
+/**
+ * Allows spaces of various lengths, including spaces in math mode.
+ *
+ * @param size size of space.
+ */
+@LaTeX
+suspend fun Space(
+    size: SpaceSize = SpaceSize.AS_SPACE
+) {
+    Command(
+        name = size.code
+    )
+}
+
+/**
  * Used to change the style of all text inside to [Modifier.BOLD].
  *
  * @param content Content whose text style will be changed.
@@ -124,22 +189,40 @@ suspend fun Emph(
     TextModifiedEnvironment(Modifier.EMPHASISING, content)
 }
 
+/**
+ * Used to create text with a single style modification with line break.
+ * For this example, the resulting text will be bold:
+ * ```
+ *  Textln(
+ *      modifier = Modifier.BOLD
+ *  ) {
+ *      "Text"
+ *  }
+ * ```
+ *
+ * @param modifier Modifier that changes the text style.
+ * @param text Text to be added to the document.
+ */
 @LaTeX
-suspend fun Textln(
+suspend inline fun Textln(
     modifier: Modifier,
     text: () -> String
 ) {
-    Text(modifier, text)
-    LineBreak()
+    Text(modifier, text()) + LineBreak()
 }
 
+/**
+ * Used to create text with a single style modification with line break.
+ *
+ * @param modifier Modifier that changes the text style.
+ * @param text Text to be added to the document.
+ */
 @LaTeX
 suspend fun Textln(
     modifier: Modifier,
     text: String
 ) {
-    Text(modifier, text)
-    LineBreak()
+    Text(modifier, text) + LineBreak()
 }
 
 /**
@@ -157,22 +240,28 @@ suspend fun Textln(
  * @param text Text to be added to the document.
  */
 @LaTeX
-suspend fun Text(
+suspend inline fun Text(
     modifier: Modifier,
-    text: () -> String
+    crossinline text: () -> String
 ) {
     TextModifiedEnvironment(modifier) {
-        Text(text = text)
+        Text(text())
     }
 }
 
+/**
+ * Used to create text with a single style modification.
+ *
+ * @param modifier Modifier that changes the text style.
+ * @param text Text to be added to the document.
+ */
 @LaTeX
 suspend fun Text(
     modifier: Modifier,
     text: String
 ) {
     TextModifiedEnvironment(modifier) {
-        Text(text = text)
+        Text(text)
     }
 }
 
@@ -198,34 +287,50 @@ suspend fun TextModifiedEnvironment(
     modifier: Modifier,
     content: @LaTeX suspend () -> Unit
 ) {
-    RawContent(
-        content = "\\${modifier.modifierName}"
+    Content(
+        raw = "\\${modifier.modifierName}"
     )
     BraceWrapped(content)
 }
 
 /**
- * `Text(text: () -> String)` function, completed with a line break.
+ * Extension for String, used to add text to the document unchanged with a
+ * line break.
  */
+suspend fun String.asTextln() {
+    Textln(this)
+}
+
+/**
+ * Extension for String, used to add text to the document unchanged.
+ */
+@LaTeX
+suspend fun String.asText() {
+    Text(this)
+}
+
+/**
+ * `Text(text: () -> String)` function, completed with a line break.
+ *
+ * @param text Text to be added to the document.
+ */
+@LaTeX
 suspend inline fun Textln(
     text: () -> String
 ) {
-    Text(
-        text = text
-    )
-    LineBreak()
+    Text(text) + LineBreak()
 }
 
 /**
  * `Text(text: String)` function, completed with a line break.
+ *
+ * @param text Text to be added to the document.
  */
-suspend inline fun Textln(
+@LaTeX
+suspend fun Textln(
     text: String
 ) {
-    Text(
-        text = text
-    )
-    LineBreak()
+    Text(text) + LineBreak()
 }
 
 /**
@@ -249,9 +354,7 @@ suspend inline fun Textln(
 suspend inline fun Text(
     text: () -> String
 ) {
-    Text(
-        text = text()
-    )
+    Text(text())
 }
 
 /**
@@ -260,11 +363,11 @@ suspend inline fun Text(
  * @param text Text to be added to the document.
  */
 @LaTeX
-suspend inline fun Text(
+suspend fun Text(
     text: String
 ) {
-    RawContent(
-        content = text
+    Content(
+        raw = text
     )
 }
 
@@ -272,7 +375,7 @@ suspend inline fun Text(
  * [LineBreak] function with a shorter name.
  */
 @LaTeX
-suspend inline fun Br() {
+suspend fun Br() {
     LineBreak()
 }
 
@@ -280,9 +383,9 @@ suspend inline fun Br() {
  * Used to wrap all new content to the next line.
  */
 @LaTeX
-suspend inline fun LineBreak() {
-    RawContent(
-        content = System.lineSeparator()
+suspend fun LineBreak() {
+    Content(
+        raw = System.lineSeparator()
     )
 }
 
@@ -290,5 +393,5 @@ suspend inline fun LineBreak() {
  * Empty function, does not add anything to the document.
  */
 @LaTeX
-suspend inline fun Empty() {
+suspend fun Empty() {
 }

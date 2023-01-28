@@ -3,7 +3,7 @@ package com.alex.eyk.kotex.latex.command
 import com.alex.eyk.kotex.latex.env.BraceWrapped
 import com.alex.eyk.kotex.latex.LaTeX
 import com.alex.eyk.kotex.latex.LineBreak
-import com.alex.eyk.kotex.latex.RawContent
+import com.alex.eyk.kotex.latex.Content
 import com.alex.eyk.kotex.latex.asOption
 import com.alex.eyk.kotex.latex.asOptionsString
 import com.alex.eyk.kotex.latex.withBracesOrEmpty
@@ -19,8 +19,8 @@ suspend fun NewEnvironment(
     begin: @LaTeX suspend () -> Unit,
     end: @LaTeX suspend () -> Unit
 ) {
-    RawContent(
-        content = definiteCommand(
+    Content(
+        raw = definiteCommand(
             command = NEW_ENVIRONMENT,
             name,
             arguments,
@@ -45,8 +45,8 @@ suspend fun NewCommand(
     optionalDefault: String = "",
     definition: @LaTeX suspend () -> Unit
 ) {
-    RawContent(
-        content = definiteCommand(
+    Content(
+        raw = definiteCommand(
             command = NEW_COMMAND,
             name,
             arguments,
@@ -69,8 +69,8 @@ suspend inline fun Command(
     optional: List<String> = emptyList(),
     endLineBreak: Boolean = true
 ) {
-    RawContent(
-        content = command(name, starred, value, options, optional)
+    Content(
+        raw = command(name, starred, value, options, optional)
     )
     if (endLineBreak) {
         LineBreak()

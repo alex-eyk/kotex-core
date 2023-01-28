@@ -2,8 +2,8 @@ package com.alex.eyk.kotex.document
 
 import com.alex.eyk.kotex.latex.Input
 import com.alex.eyk.kotex.latex.LaTeX
-import com.alex.eyk.kotex.latex.Tag
-import com.alex.eyk.kotex.latex.currentContent
+import com.alex.eyk.kotex.latex.setTag
+import com.alex.eyk.kotex.latex.documentContent
 import com.alex.eyk.kotex.latex.currentTag
 import com.alex.eyk.kotex.state.TempFilesState
 import kotlinx.coroutines.launch
@@ -66,9 +66,9 @@ open class BaseDocument(
                 declare(tag)
             }
             val lastTag = currentTag()
-            Tag(tag)
+            setTag(tag)
             content()
-            Tag(lastTag)
+            setTag(lastTag)
         }
     }
 
@@ -80,7 +80,7 @@ open class BaseDocument(
                 stateLockMap.forEach { (_, lock) ->
                     lock.lock()
                 }
-                return@withContext currentContent()
+                return@withContext documentContent()
             } finally {
                 stateLockMap.forEach { (_, lock) ->
                     lock.unlock()
