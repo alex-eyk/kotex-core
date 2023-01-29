@@ -128,6 +128,28 @@ enum class SpaceSize(
 }
 
 /**
+ * [Paragraph] function with name like in latex (`\par`).
+ */
+suspend inline fun Par() {
+    Paragraph()
+}
+
+/**
+ * Command using to start a new paragraph. An analogue of using an empty
+ * string. Since this is the end of a paragraph, a line break occurs after
+ * the command.
+ *
+ * Code `Text("text") + Br() + Br()` is equal to `Text("text") + Paragraph()`
+ */
+@LaTeX
+suspend fun Paragraph() {
+    Command(
+        name = "par",
+        endLineBreak = true
+    )
+}
+
+/**
  * Allows spaces of various lengths, including spaces in math mode.
  *
  * @param size size of space.
@@ -375,7 +397,7 @@ suspend fun Text(
  * [LineBreak] function with a shorter name.
  */
 @LaTeX
-suspend fun Br() {
+suspend inline fun Br() {
     LineBreak()
 }
 
