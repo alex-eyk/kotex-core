@@ -1,24 +1,60 @@
 @file:Suppress("REDUNDANT_INLINE_SUSPEND_FUNCTION_TYPE")
 
-package com.alex.eyk.kotex.latex.env
+package com.alex.eyk.kotex.latex
 
-import com.alex.eyk.kotex.latex.LaTeX
-import com.alex.eyk.kotex.latex.LineBreak
-import com.alex.eyk.kotex.latex.Content
-import com.alex.eyk.kotex.latex.asAdditionalArgumentsString
-import com.alex.eyk.kotex.latex.asAdditionalOptionsString
-import com.alex.eyk.kotex.latex.asOptionsString
 
-private const val OPEN_BRACE = "{"
-private const val CLOSE_BRACE = "}"
+/**
+ * [Environment] used to right-align content.
+ *
+ * @param content Content to be right aligned.
+ */
+@LaTeX
+suspend inline fun FlushRight(
+    content: @LaTeX () -> Unit
+) {
+    Environment(
+        name = "flushright",
+        content = content
+    )
+}
+
+/**
+ * [Environment] used to left-align content.
+ *
+ * @param content Content to be left aligned.
+ */
+@LaTeX
+suspend inline fun FlushLeft(
+    content: @LaTeX () -> Unit
+) {
+    Environment(
+        name = "flushleft",
+        content = content
+    )
+}
+
+/**
+ * [Environment] used to center content.
+ *
+ * @param content Content to be centered.
+ */
+@LaTeX
+suspend inline fun Center(
+    content: @LaTeX () -> Unit
+) {
+    Environment(
+        name = "center",
+        content = content
+    )
+}
 
 @LaTeX
-suspend fun Environment(
+suspend inline fun Environment(
     name: String,
     options: List<String> = emptyList(),
     additionalOptions: List<String> = emptyList(),
     arguments: List<String> = emptyList(),
-    content: @LaTeX suspend () -> Unit
+    content: @LaTeX () -> Unit
 ) {
     EnvironmentBegin(
         name,
@@ -31,18 +67,36 @@ suspend fun Environment(
 }
 
 /**
+ * Used to wrap the content passed as a parameter with angle braces. An
+ * analogue of the Wrapped function with start parameter is `[`, end is
+ * `]`.
+ *
+ * @param content Content to be wrapped.
+ */
+@LaTeX
+suspend inline fun AngleBraceWrapped(
+    content: @LaTeX () -> Unit
+) {
+    Wrapped(
+        start = "[",
+        end = "]",
+        content = content
+    )
+}
+
+/**
  * Used to wrap the content passed as a parameter with braces. An analogue of
  * the Wrapped function with start parameter is `{`, end is `}`.
  *
  * @param content Content to be wrapped.
  */
 @LaTeX
-suspend fun BraceWrapped(
-    content: suspend () -> Unit
+suspend inline fun BraceWrapped(
+    content: @LaTeX () -> Unit
 ) {
     Wrapped(
-        start = OPEN_BRACE,
-        end = CLOSE_BRACE,
+        start = "{",
+        end = "}",
         content = content
     )
 }
@@ -101,6 +155,17 @@ suspend inline fun Wrapped(
     )
 }
 
+/**
+ * Environment is a certain container, all content inside of which is modified
+ * in some way. For example, for the `center` environment, all text will be
+ * centered.
+ *
+ * The beginning of the environment is declared using this function. Every
+ * environment also needs an end, i.e. it is necessary to call function
+ * [EnvironmentEnd].
+ *
+ * @param name Name of environment.
+ */
 @LaTeX
 suspend fun EnvironmentBegin(
     name: String,
@@ -109,7 +174,7 @@ suspend fun EnvironmentBegin(
     arguments: List<String> = emptyList()
 ) {
     Content(
-        raw = blockBegin(name) +
+        raw = "\\begin{$name}" +
                 options.asOptionsString() +
                 additionalOptions.asAdditionalOptionsString() +
                 arguments.asAdditionalArgumentsString()
@@ -121,21 +186,8 @@ suspend fun EnvironmentBegin(
 suspend fun EnvironmentEnd(
     name: String
 ) {
-    LineBreak()
     Content(
-        raw = blockEnd(name)
+        raw = "\\end{$name}"
     )
     LineBreak()
-}
-
-private fun blockBegin(
-    name: String
-): String {
-    return "\\begin{$name}"
-}
-
-private fun blockEnd(
-    name: String
-): String {
-    return "\\end{$name}"
 }

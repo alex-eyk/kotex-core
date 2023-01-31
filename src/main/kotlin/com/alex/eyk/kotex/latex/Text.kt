@@ -1,7 +1,5 @@
 package com.alex.eyk.kotex.latex
 
-import com.alex.eyk.kotex.latex.command.Command
-import com.alex.eyk.kotex.latex.env.BraceWrapped
 import com.alex.eyk.kotex.util.plus
 
 /**
@@ -32,7 +30,7 @@ enum class Modifier(
     /**
      * Modifier used to changes the font style to underlined.
      */
-    UNDERLINED("underline"),
+    UNDERLINE("underline"),
 
     /**
      * Modifier used to produce text in roman font.
@@ -47,7 +45,7 @@ enum class Modifier(
     /**
      * Modifier used to produce text in typewriter font.
      */
-    TYPEWRITER("typewriter"),
+    TYPEWRITER("texttt"),
 
     /**
      * Modifier used to produce text in font with medium weight.
@@ -150,17 +148,36 @@ suspend fun Paragraph() {
 }
 
 /**
- * Allows spaces of various lengths, including spaces in math mode.
+ * Spaces with various lengths, including spaces in math mode.
  *
  * @param size size of space.
  */
 @LaTeX
 suspend fun Space(
-    size: SpaceSize = SpaceSize.AS_SPACE
+    size: SpaceSize
 ) {
     Command(
         name = size.code
     )
+}
+
+/**
+ * An analogue of the function [Space] with a short name. It is more
+ * convenient to use such a function with the [Unit.plus] operator.
+ */
+@LaTeX
+suspend inline fun ` `() {
+    Space()
+}
+
+/**
+ * Adds a space character to the document. To use multiple spaces or a space
+ * of a different size, or to use a space in math mode, use the `Space`
+ * function with the `size: SpaceSize` parameter.
+ */
+@LaTeX
+suspend fun Space() {
+    Content(raw = " ")
 }
 
 /**
@@ -169,10 +186,10 @@ suspend fun Space(
  * @param content Content whose text style will be changed.
  */
 @LaTeX
-suspend fun Bold(
-    content: @LaTeX suspend () -> Unit
+suspend inline fun Bold(
+    content: @LaTeX () -> Unit
 ) {
-    TextModifiedEnvironment(Modifier.BOLD, content)
+    Modified(Modifier.BOLD, content)
 }
 
 /**
@@ -181,22 +198,22 @@ suspend fun Bold(
  * @param content Content whose text style will be changed.
  */
 @LaTeX
-suspend fun Italic(
-    content: @LaTeX suspend () -> Unit
+suspend inline fun Italic(
+    content: @LaTeX () -> Unit
 ) {
-    TextModifiedEnvironment(Modifier.ITALIC, content)
+    Modified(Modifier.ITALIC, content)
 }
 
 /**
- * Used to change the style of all text inside to [Modifier.UNDERLINED].
+ * Used to change the style of all text inside to [Modifier.UNDERLINE].
  *
  * @param content Content whose text style will be changed.
  */
 @LaTeX
-suspend fun Underlined(
-    content: @LaTeX suspend () -> Unit
+suspend inline fun Underline(
+    content: @LaTeX () -> Unit
 ) {
-    TextModifiedEnvironment(Modifier.UNDERLINED, content)
+    Modified(Modifier.UNDERLINE, content)
 }
 
 /**
@@ -205,10 +222,10 @@ suspend fun Underlined(
  * @param content Content whose text style will be changed.
  */
 @LaTeX
-suspend fun Emph(
-    content: @LaTeX suspend () -> Unit
+suspend inline fun Emph(
+    content: @LaTeX () -> Unit
 ) {
-    TextModifiedEnvironment(Modifier.EMPHASISING, content)
+    Modified(Modifier.EMPHASISING, content)
 }
 
 /**
@@ -264,9 +281,9 @@ suspend fun Textln(
 @LaTeX
 suspend inline fun Text(
     modifier: Modifier,
-    crossinline text: () -> String
+    text: () -> String
 ) {
-    TextModifiedEnvironment(modifier) {
+    Modified(modifier) {
         Text(text())
     }
 }
@@ -282,7 +299,7 @@ suspend fun Text(
     modifier: Modifier,
     text: String
 ) {
-    TextModifiedEnvironment(modifier) {
+    Modified(modifier) {
         Text(text)
     }
 }
@@ -299,15 +316,15 @@ suspend fun Text(
  *  }
  * ```
  * There are functions that make it a little easier to work with styles, such
- * as [Bold], [Italic], [Underlined], [Emph].
+ * as [Bold], [Italic], [Underline], [Emph].
  *
  * @param modifier Modifier that changes the text style.
  * @param content Content whose text style will be changed.
  */
 @LaTeX
-suspend fun TextModifiedEnvironment(
+suspend inline fun Modified(
     modifier: Modifier,
-    content: @LaTeX suspend () -> Unit
+    content: @LaTeX () -> Unit
 ) {
     Content(
         raw = "\\${modifier.modifierName}"

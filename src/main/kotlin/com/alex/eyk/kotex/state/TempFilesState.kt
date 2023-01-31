@@ -2,7 +2,7 @@ package com.alex.eyk.kotex.state
 
 import com.alex.eyk.kotex.util.FileUtils
 import com.alex.eyk.kotex.util.PathUtils.getJarDirectoryPath
-import com.alex.eyk.kotex.util.assertSuccess
+import com.alex.eyk.kotex.ext.assertSuccess
 import java.io.File
 import java.io.FileWriter
 import java.io.Writer

@@ -1,8 +1,21 @@
 package com.alex.eyk.kotex.latex
 
+import com.alex.eyk.kotex.assertEquals
 import com.alex.eyk.kotex.document.BaseDocument
 import kotlinx.coroutines.runBlocking
 import java.io.File
+
+fun assertWithoutPreamble(
+    expected: String,
+    actual: String?
+) {
+    assertEquals(
+        expected = "\\input{preamble}" +
+                System.lineSeparator() +
+                expected,
+        actual = actual
+    )
+}
 
 fun assertLaTeX(
     content: @LaTeX suspend () -> Unit,
@@ -16,6 +29,18 @@ fun assertLaTeX(
         }
     }
     assert(readContent(files))
+}
+
+fun assertLaTeX(
+    expected: String,
+    content: @LaTeX suspend () -> Unit
+) {
+    assertLaTeX(content = content) {
+        assertWithoutPreamble(
+            expected = expected,
+            actual = it["document"]
+        )
+    }
 }
 
 private fun readContent(

@@ -2,7 +2,7 @@ package com.alex.eyk.kotex.latex.math
 
 import com.alex.eyk.kotex.latex.LaTeX
 import com.alex.eyk.kotex.latex.Content
-import com.alex.eyk.kotex.latex.env.BraceWrapped
+import com.alex.eyk.kotex.latex.BraceWrapped
 
 @LaTeX
 suspend fun Frac(

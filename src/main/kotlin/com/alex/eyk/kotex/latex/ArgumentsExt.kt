@@ -2,39 +2,39 @@ package com.alex.eyk.kotex.latex
 
 import com.alex.eyk.kotex.ext.removeLast
 
-internal fun String.withBracesOrEmpty(): String {
+fun String.withBracesOrEmpty(): String {
     return if (this.isEmpty()) "" else "{$this}"
 }
 
-internal fun String.asOption(): String {
+fun String.asOption(): String {
     return if (this.isEmpty()) "" else "[$this]"
 }
 
-internal fun Int.asOption(): String {
+fun Int.asOption(): String {
     return "[$this]"
 }
 
-internal fun List<String>.asOptionsString(): String {
+fun List<String>.asOptionsString(): String {
     if (this.isEmpty()) {
         return ""
     }
     val optionsBuilder = StringBuilder("[")
     this.forEach {
         optionsBuilder.append(it)
-            .append(", ")
+            .append(",")
     }
-    optionsBuilder.removeLast(offset = 2)
+    optionsBuilder.removeLast(offset = 1)
     return "$optionsBuilder]"
 }
 
-internal fun List<String>.asAdditionalOptionsString(): String {
+fun List<String>.asAdditionalOptionsString(): String {
     return this.wrapEachWith(
         start = "[",
         end = "]"
     )
 }
 
-internal fun List<String>.asAdditionalArgumentsString(): String {
+fun List<String>.asAdditionalArgumentsString(): String {
     return this.wrapEachWith(
         start = "{",
         end = "}"
