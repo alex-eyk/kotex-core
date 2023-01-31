@@ -2,6 +2,23 @@
 
 package com.alex.eyk.kotex.latex
 
+import com.alex.eyk.kotex.util.plus
+
+/**
+ * [Environment] that formats the content within it like a quote by indenting
+ * it.
+ *
+ * @param content Content of quote.
+ */
+@LaTeX
+suspend inline fun Quote(
+    content: @LaTeX () -> Unit
+) {
+    Environment(
+        name = "quote",
+        content = content
+    )
+}
 
 /**
  * [Environment] used to right-align content.
@@ -186,8 +203,5 @@ suspend fun EnvironmentBegin(
 suspend fun EnvironmentEnd(
     name: String
 ) {
-    Content(
-        raw = "\\end{$name}"
-    )
-    LineBreak()
+    Content(raw = "\\end{$name}") + LineBreak()
 }
