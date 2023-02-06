@@ -94,6 +94,15 @@ suspend fun UsePackage(
 }
 
 /**
+ * Extension for objects, used to add content from `toString()` method to the
+ * document unchanged.
+ */
+@LaTeX
+suspend fun <E> E.asContent() {
+    Content(raw = this.toString())
+}
+
+/**
  * Every [LaTeX] function eventually necessarily calls this function to add
  * relevant content to the document. Thus, a function annotated with [LaTeX]
  * annotation converts input data into LaTeX content and calls that function.

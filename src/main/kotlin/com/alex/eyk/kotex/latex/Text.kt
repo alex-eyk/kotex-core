@@ -335,17 +335,22 @@ suspend inline fun Modified(
 /**
  * Extension for String, used to add text to the document unchanged with a
  * line break.
+ *
+ * @see asText
  */
 suspend fun String.asTextln() {
     Textln(this)
 }
 
 /**
- * Extension for String, used to add text to the document unchanged.
+ * Extension for objects, used to add text to the document unchanged. The
+ * result of the function call is the same as the result of [asContent].
+ * Should use [asText] in case text will be added to the document and not,
+ * for example, a mathematical expression.
  */
 @LaTeX
-suspend fun String.asText() {
-    Text(this)
+suspend fun <E> E.asText() {
+    Text(this.toString())
 }
 
 /**
