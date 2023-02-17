@@ -1,6 +1,7 @@
 package com.alex.eyk.kotex.util
 
 import com.alex.eyk.kotex.ext.copy
+import java.lang.IllegalArgumentException
 
 internal typealias Matrix<E> = List<List<E>>
 
@@ -17,6 +18,11 @@ internal inline fun <E> MutableMatrix(
     width: Int,
     initial: (i: Int, j: Int) -> E
 ): MutableMatrix<E> {
+    if (height <= 0 || width <= 0) {
+        throw IllegalArgumentException(
+            "Matrix height and width should be > 0, actual: { height: $height, width: $width }"
+        )
+    }
     val matrix = mutableListOf<MutableList<E>>()
     for (i in 0 until height) {
         matrix.add(mutableListOf())
