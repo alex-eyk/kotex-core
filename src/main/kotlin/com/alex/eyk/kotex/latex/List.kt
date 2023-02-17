@@ -1,3 +1,5 @@
+@file:Suppress("REDUNDANT_INLINE_SUSPEND_FUNCTION_TYPE")
+
 package com.alex.eyk.kotex.latex
 
 import com.alex.eyk.kotex.latex.ListType.DESCRIPTION
@@ -121,7 +123,7 @@ suspend inline fun <E> Itemize(
 suspend inline fun <E> List(
     type: ListType,
     elements: Iterable<E>,
-    map: @LaTeX (element: E) -> Unit
+    map: @LaTeX suspend (element: E) -> Unit
 ) {
     Environment(
         name = type.environment,
@@ -140,7 +142,7 @@ suspend inline fun <E> List(
  */
 @LaTeX
 suspend inline fun Description(
-    content: @LaTeX () -> Unit
+    content: @LaTeX suspend () -> Unit
 ) {
     Environment(
         name = DESCRIPTION.environment,
@@ -157,7 +159,7 @@ suspend inline fun Description(
  */
 @LaTeX
 suspend inline fun Enumerate(
-    content: @LaTeX () -> Unit
+    content: @LaTeX suspend () -> Unit
 ) {
     Environment(
         name = ENUMERATE.environment,
@@ -174,7 +176,7 @@ suspend inline fun Enumerate(
  */
 @LaTeX
 suspend inline fun Itemize(
-    content: @LaTeX () -> Unit
+    content: @LaTeX suspend () -> Unit
 ) {
     Environment(
         name = ITEMIZE.environment,
@@ -193,7 +195,7 @@ suspend inline fun Itemize(
 @LaTeX
 suspend inline fun Item(
     label: String,
-    content: @LaTeX () -> Unit
+    content: @LaTeX suspend () -> Unit
 ) {
     Item(label = { Text(label) }, content)
 }
@@ -207,8 +209,8 @@ suspend inline fun Item(
  */
 @LaTeX
 suspend inline fun Item(
-    label: @LaTeX () -> Unit,
-    content: @LaTeX () -> Unit
+    label: @LaTeX suspend () -> Unit,
+    content: @LaTeX suspend () -> Unit
 ) {
     Command(name = "item")
     AngleBraceWrapped(label)
@@ -224,7 +226,7 @@ suspend inline fun Item(
  */
 @LaTeX
 suspend inline fun Item(
-    content: @LaTeX () -> Unit
+    content: @LaTeX suspend () -> Unit
 ) {
     Command(name = "item") + ` `() + content() + LineBreak()
 }

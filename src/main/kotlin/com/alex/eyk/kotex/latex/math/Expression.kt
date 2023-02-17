@@ -1,3 +1,5 @@
+@file:Suppress("REDUNDANT_INLINE_SUSPEND_FUNCTION_TYPE")
+
 package com.alex.eyk.kotex.latex.math
 
 import com.alex.eyk.kotex.latex.Environment
@@ -15,7 +17,7 @@ import com.alex.eyk.kotex.latex.asText
  */
 @LaTeX
 suspend inline fun Equation(
-    content: () -> Unit
+    content: @LaTeX suspend () -> Unit
 ) {
     Environment(
         name = "equation",
@@ -47,7 +49,7 @@ suspend fun String.asExpr() {
  */
 @LaTeX
 suspend inline fun Expression(
-    content: @LaTeX () -> Unit
+    content: @LaTeX suspend () -> Unit
 ) {
     Wrapped(
         start = """\[""",
@@ -99,7 +101,7 @@ suspend fun String.asInlineExpr() {
  */
 @LaTeX
 suspend inline fun InlineExpression(
-    content: @LaTeX () -> Unit
+    content: @LaTeX suspend () -> Unit
 ) {
     Wrapped(
         with = "$",

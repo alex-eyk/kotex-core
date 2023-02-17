@@ -1,3 +1,5 @@
+@file:Suppress("REDUNDANT_INLINE_SUSPEND_FUNCTION_TYPE")
+
 package com.alex.eyk.kotex.latex
 
 import com.alex.eyk.kotex.ext.minimize
@@ -113,7 +115,7 @@ suspend fun RaggedRight() {
  */
 @LaTeX
 suspend inline fun Group(
-    content: @LaTeX () -> Unit
+    content: @LaTeX suspend () -> Unit
 ) {
     BeginGroup()
     content()
@@ -148,8 +150,8 @@ suspend inline fun NewEnvironment(
     name: String,
     arguments: Int = 0,
     optionalDefault: String = "",
-    begin: @LaTeX () -> Unit,
-    end: @LaTeX () -> Unit
+    begin: @LaTeX suspend () -> Unit,
+    end: @LaTeX suspend () -> Unit
 ) {
     val argsOption = if (arguments == 0) "" else arguments.asOption()
     Content(
@@ -171,7 +173,7 @@ suspend inline fun NewCommand(
     name: String,
     arguments: Int = 0,
     optionalDefault: String = "",
-    definition: @LaTeX () -> Unit
+    definition: @LaTeX suspend () -> Unit
 ) {
     val argsOption = if (arguments == 0) "" else arguments.asOption()
     Content(

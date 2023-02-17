@@ -12,7 +12,7 @@ import com.alex.eyk.kotex.util.plus
  */
 @LaTeX
 suspend inline fun Quote(
-    content: @LaTeX () -> Unit
+    content: @LaTeX suspend () -> Unit
 ) {
     Environment(
         name = "quote",
@@ -27,7 +27,7 @@ suspend inline fun Quote(
  */
 @LaTeX
 suspend inline fun FlushRight(
-    content: @LaTeX () -> Unit
+    content: @LaTeX suspend () -> Unit
 ) {
     Environment(
         name = "flushright",
@@ -42,7 +42,7 @@ suspend inline fun FlushRight(
  */
 @LaTeX
 suspend inline fun FlushLeft(
-    content: @LaTeX () -> Unit
+    content: @LaTeX suspend () -> Unit
 ) {
     Environment(
         name = "flushleft",
@@ -57,7 +57,7 @@ suspend inline fun FlushLeft(
  */
 @LaTeX
 suspend inline fun Center(
-    content: @LaTeX () -> Unit
+    content: @LaTeX suspend () -> Unit
 ) {
     Environment(
         name = "center",
@@ -71,7 +71,7 @@ suspend inline fun Environment(
     options: List<String> = emptyList(),
     additionalOptions: List<String> = emptyList(),
     arguments: List<String> = emptyList(),
-    content: @LaTeX () -> Unit
+    content: @LaTeX suspend () -> Unit
 ) {
     EnvironmentBegin(
         name,
@@ -92,7 +92,7 @@ suspend inline fun Environment(
  */
 @LaTeX
 suspend inline fun AngleBraceWrapped(
-    content: @LaTeX () -> Unit
+    content: @LaTeX suspend () -> Unit
 ) {
     Wrapped(
         start = "[",
@@ -109,7 +109,7 @@ suspend inline fun AngleBraceWrapped(
  */
 @LaTeX
 suspend inline fun BraceWrapped(
-    content: @LaTeX () -> Unit
+    content: @LaTeX suspend () -> Unit
 ) {
     Wrapped(
         start = "{",

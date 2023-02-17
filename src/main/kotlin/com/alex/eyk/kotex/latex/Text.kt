@@ -1,3 +1,5 @@
+@file:Suppress("REDUNDANT_INLINE_SUSPEND_FUNCTION_TYPE")
+
 package com.alex.eyk.kotex.latex
 
 import com.alex.eyk.kotex.util.plus
@@ -187,7 +189,7 @@ suspend fun Space() {
  */
 @LaTeX
 suspend inline fun Bold(
-    content: @LaTeX () -> Unit
+    content: @LaTeX suspend () -> Unit
 ) {
     Modified(Modifier.BOLD, content)
 }
@@ -199,7 +201,7 @@ suspend inline fun Bold(
  */
 @LaTeX
 suspend inline fun Italic(
-    content: @LaTeX () -> Unit
+    content: @LaTeX suspend () -> Unit
 ) {
     Modified(Modifier.ITALIC, content)
 }
@@ -211,7 +213,7 @@ suspend inline fun Italic(
  */
 @LaTeX
 suspend inline fun Underline(
-    content: @LaTeX () -> Unit
+    content: @LaTeX suspend () -> Unit
 ) {
     Modified(Modifier.UNDERLINE, content)
 }
@@ -223,7 +225,7 @@ suspend inline fun Underline(
  */
 @LaTeX
 suspend inline fun Emph(
-    content: @LaTeX () -> Unit
+    content: @LaTeX suspend () -> Unit
 ) {
     Modified(Modifier.EMPHASISING, content)
 }
@@ -324,7 +326,7 @@ suspend fun Text(
 @LaTeX
 suspend inline fun Modified(
     modifier: Modifier,
-    content: @LaTeX () -> Unit
+    content: @LaTeX suspend () -> Unit
 ) {
     Content(
         raw = "\\${modifier.modifierName}"
