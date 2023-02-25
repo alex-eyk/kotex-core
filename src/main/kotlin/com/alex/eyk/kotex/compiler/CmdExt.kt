@@ -6,7 +6,7 @@ import java.io.File
 import java.io.IOException
 import java.util.concurrent.TimeUnit
 
-suspend fun String.execute(
+internal suspend fun String.execute(
     workingDir: File,
     timeout: Long = -1L,
     timeUnit: TimeUnit = TimeUnit.MINUTES
@@ -24,7 +24,7 @@ suspend fun String.execute(
                     waitFor(timeout, timeUnit)
                 }
             }
-            return@withContext CommandResult.Success(
+            return@withContext CommandResult.Completed(
                 output = process.inputStream.bufferedReader().readText()
             )
         } catch (e: IOException) {
@@ -33,9 +33,9 @@ suspend fun String.execute(
     }
 }
 
-sealed class CommandResult {
+internal sealed class CommandResult {
 
-    data class Success(
+    data class Completed(
         val output: String
     ) : CommandResult()
 

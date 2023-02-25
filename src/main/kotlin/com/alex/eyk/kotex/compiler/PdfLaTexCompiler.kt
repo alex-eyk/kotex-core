@@ -1,9 +1,9 @@
 package com.alex.eyk.kotex.compiler
 
 import com.alex.eyk.kotex.document.AbstractDocument
+import com.alex.eyk.kotex.ext.assertSuccess
 import com.alex.eyk.kotex.util.FileUtils
 import com.alex.eyk.kotex.util.PathUtils.getJarDirectoryPath
-import com.alex.eyk.kotex.ext.assertSuccess
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -29,25 +29,36 @@ class PdfLaTexCompiler(
     ): File {
         val primary = getPrimaryFile(document)
         when (
-            val result = "pdflatex ${primary.name}".execute(primary.parentFile)
+            val result = "pdflatex -halt-on-error -file-line-error ${primary.name}"
+                .execute(primary.parentFile)
         ) {
-            is CommandResult.Success -> {
+            is CommandResult.Completed -> {
+                if (!isResultSuccess(result.output)) {
+                    throw IllegalStateException("Unable to compile document, output: ${result.output}")
+                }
                 val source = File("${tempPath}/${document.name}/temp/${document.name}.pdf")
                 val out = File("$outputPath/${document.name}/${document.name}.pdf")
-                withContext(Dispatchers.IO) {
+                return withContext(Dispatchers.IO) {
                     if (out.exists()) {
                         FileUtils.deleteWithBackup(out)
                     }
                     out.createNewFile().assertSuccess()
                     source.copyTo(out, overwrite = true)
                     source.delete()
+                    return@withContext out
                 }
-                return out
             }
+
             is CommandResult.Failure -> {
                 throw IllegalStateException("Unable to compile pdf", result.e)
             }
         }
+    }
+
+    private fun isResultSuccess(
+        output: String
+    ): Boolean {
+        return output.contains("Output written")
     }
 
     private suspend fun getPrimaryFile(
