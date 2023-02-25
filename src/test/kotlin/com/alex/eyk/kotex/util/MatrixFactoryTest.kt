@@ -13,7 +13,7 @@ class MatrixFactoryTest {
             mutableListOf(4, 5, 6),
             mutableListOf(7, 8, 9)
         )
-        val actual = MutableMatrix(
+        val actual = mutableMatrixOf(
             height = 3,
             width = 3,
             initial = { i, j ->
@@ -26,7 +26,7 @@ class MatrixFactoryTest {
     @Test
     fun mutableMatrixWrongArgumentTest() {
         assertThrows<IllegalArgumentException> {
-            MutableMatrix(height = 0, width = -1) { _, _ -> 0 }
+            mutableMatrixOf(height = 0, width = -1) { _, _ -> 0 }
         }
     }
 
@@ -40,14 +40,14 @@ class MatrixFactoryTest {
             mutableListOf(1, 2, 3),
             mutableListOf(2, 3, 4)
         )
-        val actual = MutableMatrix(matrix)
+        val actual = mutableMatrixOf(matrix)
         assertEquals(expected, actual)
     }
 
     @Test
     fun mutableMatrixEmptyCopyTest() {
         val expected = mutableListOf<List<Int>>()
-        val actual = MutableMatrix(emptyList<List<Int>>())
+        val actual = mutableMatrixOf(emptyList<List<Int>>())
         assertEquals(expected, actual)
     }
 }

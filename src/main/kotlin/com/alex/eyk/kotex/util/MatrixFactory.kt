@@ -7,13 +7,13 @@ internal typealias Matrix<E> = List<List<E>>
 
 internal typealias MutableMatrix<E> = MutableList<MutableList<E>>
 
-internal inline fun <E> Matrix(
+internal inline fun <E> matrixOf(
     height: Int,
     width: Int,
     initial: (i: Int, j: Int) -> E
-): Matrix<E> = MutableMatrix(height, width, initial)
+): Matrix<E> = mutableMatrixOf(height, width, initial)
 
-internal inline fun <E> MutableMatrix(
+internal inline fun <E> mutableMatrixOf(
     height: Int,
     width: Int,
     initial: (i: Int, j: Int) -> E
@@ -33,7 +33,7 @@ internal inline fun <E> MutableMatrix(
     return matrix
 }
 
-internal fun <E> MutableMatrix(
+internal fun <E> mutableMatrixOf(
     matrix: Matrix<E>
 ): MutableMatrix<E> {
     val mutableMatrix = mutableListOf<MutableList<E>>()

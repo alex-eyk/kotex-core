@@ -5,6 +5,7 @@ import com.alex.eyk.kotex.ext.insert
 import com.alex.eyk.kotex.ext.width
 import com.alex.eyk.kotex.latex.LaTeX
 import com.alex.eyk.kotex.util.MutableMatrix
+import com.alex.eyk.kotex.util.mutableMatrixOf
 
 class TableBuilder {
 
@@ -14,7 +15,7 @@ class TableBuilder {
         content: List<List<T>>,
         map: suspend (item: T, row: Int, column: Int) -> Unit
     ): TableBuilder = apply {
-        this.content = MutableMatrix(
+        this.content = mutableMatrixOf(
             height = content.height,
             width = content.width
         ) { i, j ->
@@ -27,7 +28,7 @@ class TableBuilder {
         width: Int,
         content: @LaTeX suspend (row: Int, column: Int) -> Unit
     ): TableBuilder = apply {
-        this.content = MutableMatrix(height, width) { i, j ->
+        this.content = mutableMatrixOf(height, width) { i, j ->
             { content(i, j) }
         }
     }
