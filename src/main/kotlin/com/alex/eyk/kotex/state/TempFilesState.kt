@@ -1,8 +1,9 @@
 package com.alex.eyk.kotex.state
 
+import com.alex.eyk.kotex.entity.Package
+import com.alex.eyk.kotex.ext.assertSuccess
 import com.alex.eyk.kotex.util.FileUtils
 import com.alex.eyk.kotex.util.PathUtils.getJarDirectoryPath
-import com.alex.eyk.kotex.ext.assertSuccess
 import java.io.File
 import java.io.FileWriter
 import java.io.Writer
@@ -27,6 +28,9 @@ internal class TempFilesState(
 
     private var tag: CharSequence = name
 
+    private val externalPackages: MutableSet<Package> = mutableSetOf()
+    private val externalPackageNames: MutableSet<CharSequence> = mutableSetOf()
+
     init {
         val directory = File(tempPath)
         if (!directory.exists()) {
@@ -34,6 +38,29 @@ internal class TempFilesState(
         }
         addTagIfNecessary(PREAMBLE)
         addTagIfNecessary(name)
+    }
+
+    override fun addPackage(
+        `package`: Package
+    ) {
+        externalPackages.add(`package`)
+        externalPackageNames.add(
+            `package`.name
+        )
+    }
+
+    override fun isPackageUsed(
+        `package`: Package
+    ): Boolean {
+        return if (`package`.name !in externalPackageNames) {
+            false
+        } else if (`package` in externalPackages) {
+            true
+        } else {
+            throw IllegalStateException(
+                "Package with name: ${`package`.name} already used with other options"
+            )
+        }
     }
 
     override fun append(

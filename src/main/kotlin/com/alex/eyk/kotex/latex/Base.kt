@@ -40,7 +40,7 @@ suspend fun Input(
  */
 @LaTeX
 suspend fun DeclareExternalPackages(
-    packages: List<Package>
+    vararg packages: Package
 ) {
     packages.forEach {
         DeclareExternalPackage(it)
@@ -51,14 +51,17 @@ suspend fun DeclareExternalPackages(
  * A function that adds a declaration of the use of an external package to
  * the beginning of the [LaTeX] document.
  *
- * @param package_ external package to be used in the document.
+ * @param package external package to be used in the document.
  */
 @LaTeX
 suspend fun DeclareExternalPackage(
-    package_: Package
+    `package`: Package
 ) {
+    if (documentState().isPackageUsed(`package`)) {
+        return
+    }
     forTag(TempFilesState.PREAMBLE) {
-        UsePackage(package_)
+        UsePackage(`package`)
     }
 }
 
@@ -81,14 +84,16 @@ suspend fun UsePackages(
  * Command that allows to use external package that extend the capabilities
  * of LaTeX. Should be in the preamble of the document.
  *
- * @param package_ external package to be used in the document.
+ * @param package external package to be used in the document.
  */
 @LaTeX
 suspend fun UsePackage(
-    package_: Package
+    `package`: Package
 ) {
+    documentState()
+        .addPackage(`package`)
     Content(
-        raw = "\\usepackage${package_.options.asOptionsString()}{${package_.name}}" +
+        raw = "\\usepackage${`package`.options.asOptionsString()}{${`package`.name}}" +
                 System.lineSeparator()
     )
 }
@@ -204,11 +209,19 @@ internal suspend fun documentContent(): Iterable<File> {
 internal suspend fun documentState(): MultiState<Iterable<File>> {
     val key = currentCoroutineContext()[Key]
     key?.let {
-        return multiStateFactory.get(it.name)
+        try {
+            return multiStateFactory.get(it.name)
+        } catch (e: NoSuchElementException) {
+            throw IllegalStateException(
+                "The content state does not exist, it was probably deleted after the document was closed.",
+                e
+            )
+        }
     } ?: throw IllegalStateException(
-        "Unable to get document name from coroutine context. Check that @LaTeX functions " +
-                "are called only in the correct context and `registerDocument` function" +
-                "was called."
+        """
+            Unable to get document name from coroutine context. Check that @LaTeX functions
+            are called only in the correct context and `registerDocument` function was called
+        """.trimIndent()
     )
 }
 

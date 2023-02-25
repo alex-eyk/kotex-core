@@ -1,10 +1,11 @@
 package com.alex.eyk.kotex.document
 
+import com.alex.eyk.kotex.latex.DocClass
 import com.alex.eyk.kotex.latex.Input
 import com.alex.eyk.kotex.latex.LaTeX
-import com.alex.eyk.kotex.latex.setTag
-import com.alex.eyk.kotex.latex.documentContent
 import com.alex.eyk.kotex.latex.currentTag
+import com.alex.eyk.kotex.latex.documentContent
+import com.alex.eyk.kotex.latex.setTag
 import com.alex.eyk.kotex.state.TempFilesState
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -51,8 +52,6 @@ open class BaseDocument(
                 Input(tag)
                 declaredTags.add(tag)
             }
-        } else {
-            throw IllegalStateException("Tag $tag already declared")
         }
     }
 
@@ -72,26 +71,42 @@ open class BaseDocument(
         }
     }
 
+    fun setDocumentClass(
+        name: String,
+        options: List<String>
+    ) = append(tag = "preamble") {
+        DocClass(name, options)
+    }
+
     override suspend fun getContent(): Iterable<File> {
         return withContext(
             context = blockScope.coroutineContext
         ) {
             try {
-                stateLockMap.forEach { (_, lock) ->
-                    lock.lock()
-                }
+                lockAll()
                 return@withContext documentContent()
             } finally {
-                stateLockMap.forEach { (_, lock) ->
-                    lock.unlock()
-                }
+                unlockAll()
             }
         }
     }
 
-    override fun getContent(onComplete: (Iterable<File>) -> Unit) {
+    override fun getContent(
+        onComplete: (Iterable<File>) -> Unit
+    ) {
         blockScope.launch {
             onComplete(getContent())
+        }
+    }
+
+    override fun close() {
+        blockScope.launch {
+            try {
+                lockAll()
+                super.close()
+            } finally {
+                unlockAll()
+            }
         }
     }
 
@@ -102,5 +117,17 @@ open class BaseDocument(
             stateLockMap[tag] = ReentrantLock()
         }
         return stateLockMap[tag]!!
+    }
+
+    private fun lockAll() {
+        stateLockMap.forEach { (_, lock) ->
+            lock.lock()
+        }
+    }
+
+    private fun unlockAll() {
+        stateLockMap.forEach { (_, lock) ->
+            lock.unlock()
+        }
     }
 }
