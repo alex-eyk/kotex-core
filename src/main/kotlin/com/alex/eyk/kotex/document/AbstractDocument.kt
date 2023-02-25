@@ -14,7 +14,8 @@ import java.util.concurrent.Executors
 import kotlin.coroutines.CoroutineContext
 
 abstract class AbstractDocument<C>(
-    val name: String
+    val name: String,
+    path: String
 ) : Closeable {
 
     private val dispatcher: CoroutineDispatcher = Executors.newSingleThreadExecutor()
@@ -36,7 +37,7 @@ abstract class AbstractDocument<C>(
     )
 
     init {
-        registerDocument(name)
+        registerDocument(name, path)
     }
 
     abstract fun append(

@@ -1,12 +1,16 @@
 package com.alex.eyk.kotex.compiler
 
 import com.alex.eyk.kotex.document.AbstractDocument
-import com.alex.eyk.kotex.ext.assertSuccess
-import com.alex.eyk.kotex.util.FileUtils
 import com.alex.eyk.kotex.util.PathUtils.getJarDirectoryPath
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
+import java.nio.file.StandardCopyOption
+import kotlin.io.path.createFile
+import kotlin.io.path.exists
 
 class PdfLaTexCompiler(
     private val tempPath: String = getJarDirectoryPath(),
@@ -26,7 +30,7 @@ class PdfLaTexCompiler(
 
     override suspend fun compile(
         document: AbstractDocument<Iterable<File>>
-    ): File {
+    ): Path {
         val primary = getPrimaryFile(document)
         when (
             val result = "pdflatex -halt-on-error -file-line-error ${primary.name}"
@@ -36,15 +40,13 @@ class PdfLaTexCompiler(
                 if (!isResultSuccess(result.output)) {
                     throw IllegalStateException("Unable to compile document, output: ${result.output}")
                 }
-                val source = File("${tempPath}/${document.name}/temp/${document.name}.pdf")
-                val out = File("$outputPath/${document.name}/${document.name}.pdf")
+                val source = Paths.get("${tempPath}/${document.name}/temp/${document.name}.pdf")
+                val out = Paths.get("$outputPath/${document.name}/${document.name}.pdf")
                 return withContext(Dispatchers.IO) {
-                    if (out.exists()) {
-                        FileUtils.deleteWithBackup(out)
+                    if (!out.exists()) {
+                        out.createFile()
                     }
-                    out.createNewFile().assertSuccess()
-                    source.copyTo(out, overwrite = true)
-                    source.delete()
+                    Files.move(source, out, StandardCopyOption.REPLACE_EXISTING)
                     return@withContext out
                 }
             }

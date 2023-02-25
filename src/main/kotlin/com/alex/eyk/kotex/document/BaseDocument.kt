@@ -1,12 +1,13 @@
 package com.alex.eyk.kotex.document
 
-import com.alex.eyk.kotex.latex.DocClass
+import com.alex.eyk.kotex.latex.DocumentClass
 import com.alex.eyk.kotex.latex.Input
 import com.alex.eyk.kotex.latex.LaTeX
 import com.alex.eyk.kotex.latex.currentTag
 import com.alex.eyk.kotex.latex.documentContent
 import com.alex.eyk.kotex.latex.setTag
 import com.alex.eyk.kotex.state.TempFilesState
+import com.alex.eyk.kotex.util.PathUtils
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -15,8 +16,9 @@ import java.util.concurrent.locks.ReentrantLock
 
 open class BaseDocument(
     name: String,
+    path: String = PathUtils.getJarDirectoryPath(),
     private val multiDeclareAllowed: Boolean = false
-) : AbstractDocument<Iterable<File>>(name) {
+) : AbstractDocument<Iterable<File>>(name, path) {
 
     private val stateLockMap: MutableMap<String, Lock> = HashMap()
     private val declaredTags: MutableSet<String> = HashSet()
@@ -75,7 +77,7 @@ open class BaseDocument(
         name: String,
         options: List<String>
     ) = append(tag = "preamble") {
-        DocClass(name, options)
+        DocumentClass(name, options)
     }
 
     override suspend fun getContent(): Iterable<File> {

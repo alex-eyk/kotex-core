@@ -174,11 +174,12 @@ internal suspend fun setTag(
  * @param name name of the document without extensions. It must be unique.
  */
 internal fun registerDocument(
-    name: String
+    name: String,
+    path: String
 ) {
     assertName(name)
     multiStateFactory.put(
-        name, TempFilesState(name)
+        name, TempFilesState(name, path)
     )
 }
 
