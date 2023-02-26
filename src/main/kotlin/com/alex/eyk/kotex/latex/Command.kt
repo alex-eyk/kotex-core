@@ -4,6 +4,16 @@ package com.alex.eyk.kotex.latex
 
 import com.alex.eyk.kotex.ext.minimize
 
+@LaTeX
+suspend fun Caption(
+    caption: String
+) {
+    Command(
+        name = "caption",
+        value = caption
+    )
+}
+
 /**
  * Adds a vertical space of some size.
  *
@@ -146,6 +156,19 @@ suspend fun EndGroup() {
 }
 
 @LaTeX
+suspend fun DocumentClass(
+    name: String,
+    options: List<String> = emptyList()
+) {
+    Command(
+        name = "documentclass",
+        value = name,
+        options = options,
+        endLineBreak = true
+    )
+}
+
+@LaTeX
 suspend inline fun NewEnvironment(
     name: String,
     arguments: Int = 0,
@@ -190,6 +213,7 @@ suspend inline fun NewCommand(
 suspend fun Command(
     name: String,
     value: String = "",
+    options: List<String> = emptyList(),
     optional: List<String> = emptyList(),
     arguments: List<String> = emptyList(),
     endLineBreak: Boolean = false
@@ -198,6 +222,7 @@ suspend fun Command(
         raw = "\\$name" +
                 optional.asAdditionalOptionsString() +
                 arguments.asAdditionalArgumentsString() +
+                options.asOptionsString() +
                 value.withBracesOrEmpty()
     )
     if (endLineBreak) {

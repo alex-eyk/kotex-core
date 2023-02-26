@@ -10,7 +10,9 @@ import com.alex.eyk.kotex.latex.DeclareExternalPackage
 import com.alex.eyk.kotex.latex.Environment
 import com.alex.eyk.kotex.latex.LaTeX
 import com.alex.eyk.kotex.latex.LineBreak
+import com.alex.eyk.kotex.latex.NextEntry
 import com.alex.eyk.kotex.latex.Position
+import com.alex.eyk.kotex.latex.RowEnd
 import com.alex.eyk.kotex.latex.table.Alignment.CENTER
 import com.alex.eyk.kotex.util.Matrix
 import com.alex.eyk.kotex.util.plus
@@ -235,31 +237,6 @@ suspend fun Multicolumn(
             makeTablePreamble(alignments)
         )
     ) + BraceWrapped(content)
-}
-
-/**
- * The end of the table row.
- */
-@LaTeX
-suspend inline fun RowEnd() {
-    Content(raw = """ \\""") + LineBreak()
-}
-
-/**
- * An analogue of function [NextEntry] with shorter name. Should use for
- * separate one entry from another. Available only inside the row.
- */
-suspend inline fun `&`() {
-    NextEntry()
-}
-
-/**
- * This unit should use for separate one entry inside one row from another.
- * Available only inside the row.
- */
-@LaTeX
-suspend inline fun NextEntry() {
-    Content(raw = """ & """)
 }
 
 /**

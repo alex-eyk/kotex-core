@@ -3,14 +3,13 @@ package com.alex.eyk.kotex.state
 import com.alex.eyk.kotex.entity.Package
 import com.alex.eyk.kotex.ext.assertSuccess
 import com.alex.eyk.kotex.util.FileUtils
-import com.alex.eyk.kotex.util.PathUtils.getJarDirectoryPath
 import java.io.File
 import java.io.FileWriter
 import java.io.Writer
 
 internal class TempFilesState(
     name: String,
-    path: String = getJarDirectoryPath(),
+    path: String,
     private val deleteSourceOnClose: Boolean = false
 ) : MultiState<Iterable<File>>, FileState<Iterable<File>> {
 

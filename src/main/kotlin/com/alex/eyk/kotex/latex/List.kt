@@ -213,7 +213,7 @@ suspend inline fun Item(
     content: @LaTeX suspend () -> Unit
 ) {
     Command(name = "item")
-    AngleBraceWrapped(label)
+    BracketsWrapped(label)
     Space()
     content()
     LineBreak()

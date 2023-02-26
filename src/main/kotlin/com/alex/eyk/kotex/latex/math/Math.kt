@@ -9,6 +9,13 @@ import com.alex.eyk.kotex.latex.asText
 import com.alex.eyk.kotex.util.plus
 
 @LaTeX
+suspend fun Tilde(
+    content: @LaTeX suspend () -> Unit
+) {
+    Content("""\tilde""") + BraceWrapped(content)
+}
+
+@LaTeX
 suspend fun Frac(
     numerator: Int,
     denominator: Int

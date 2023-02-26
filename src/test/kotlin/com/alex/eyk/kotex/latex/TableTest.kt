@@ -3,19 +3,16 @@ package com.alex.eyk.kotex.latex
 import com.alex.eyk.kotex.ext.listOf
 import com.alex.eyk.kotex.latex.Position.BOTTOM
 import com.alex.eyk.kotex.latex.Position.TOP
-import com.alex.eyk.kotex.latex.table.`&`
 import com.alex.eyk.kotex.latex.table.Alignment.CENTER
 import com.alex.eyk.kotex.latex.table.Alignment.LEFT
 import com.alex.eyk.kotex.latex.table.Alignment.RIGHT
 import com.alex.eyk.kotex.latex.table.Cline
 import com.alex.eyk.kotex.latex.table.Hline
 import com.alex.eyk.kotex.latex.table.Multicolumn
-import com.alex.eyk.kotex.latex.table.NextEntry
-import com.alex.eyk.kotex.latex.table.RowEnd
 import com.alex.eyk.kotex.latex.table.Table
 import com.alex.eyk.kotex.latex.table.TableRow
 import com.alex.eyk.kotex.latex.table.Tabular
-import com.alex.eyk.kotex.util.Matrix
+import com.alex.eyk.kotex.util.matrixOf
 import com.alex.eyk.kotex.util.plus
 import org.junit.jupiter.api.Test
 
@@ -34,7 +31,7 @@ class TableTest {
             
         """.trimIndent()
     ) {
-        val matrix = Matrix(
+        val matrix = matrixOf(
             height = 2,
             width = 3
         ) { i, j ->
@@ -60,7 +57,7 @@ class TableTest {
             
         """.trimIndent()
     ) {
-        val matrix = Matrix(
+        val matrix = matrixOf(
             height = 2,
             width = 4
         ) { i, j ->
@@ -136,7 +133,7 @@ class TableTest {
     ) {
         Table(
             alignment = RIGHT,
-            content = Matrix(
+            content = matrixOf(
                 height = 1,
                 width = 4
             ) { i, j -> { (i + j + 1).asContent() } }
@@ -160,7 +157,7 @@ class TableTest {
             alignments = listOf(
                 CENTER, RIGHT, RIGHT
             ),
-            content = Matrix(
+            content = matrixOf(
                 height = 2,
                 width = 3,
             ) { i, j -> { (i + j + 1).asContent() } }

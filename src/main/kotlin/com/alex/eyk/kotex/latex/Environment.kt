@@ -4,6 +4,33 @@ package com.alex.eyk.kotex.latex
 
 import com.alex.eyk.kotex.util.plus
 
+@LaTeX
+suspend inline fun CenteredFigure(
+    content: @LaTeX suspend () -> Unit
+) {
+    Figure(
+        position = Position.HERE_STRICT
+    ) {
+        Centering()
+        content()
+    }
+}
+
+@LaTeX
+suspend inline fun Figure(
+    position: Position? = null,
+    content: @LaTeX suspend () -> Unit
+) {
+    Environment(
+        name = "figure",
+        additionalOptions = if (position != null) listOf(position.parameter) else emptyList(),
+        content = content
+    )
+    position?.requiresPackage?.let {
+        DeclareExternalPackage(it)
+    }
+}
+
 /**
  * [Environment] that formats the content within it like a quote by indenting
  * it.
@@ -66,6 +93,26 @@ suspend inline fun Center(
 }
 
 @LaTeX
+suspend inline fun Document(
+    content: suspend () -> Unit
+) {
+    Environment(
+        name = "document",
+        content = content
+    )
+}
+
+@LaTeX
+suspend fun DocumentBegin() {
+    EnvironmentBegin(name = "document")
+}
+
+@LaTeX
+suspend fun DocumentEnd() {
+    EnvironmentEnd(name = "document")
+}
+
+@LaTeX
 suspend inline fun Environment(
     name: String,
     options: List<String> = emptyList(),
@@ -91,7 +138,7 @@ suspend inline fun Environment(
  * @param content Content to be wrapped.
  */
 @LaTeX
-suspend inline fun AngleBraceWrapped(
+suspend inline fun BracketsWrapped(
     content: @LaTeX suspend () -> Unit
 ) {
     Wrapped(

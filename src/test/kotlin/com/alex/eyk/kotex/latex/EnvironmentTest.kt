@@ -78,7 +78,7 @@ class EnvironmentTest {
     fun angleBraceWrappedTest() = assertLaTeX(
         expected = "[test]"
     ) {
-        AngleBraceWrapped {
+        BracketsWrapped {
             "test".asText()
         }
     }

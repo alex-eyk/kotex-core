@@ -33,17 +33,13 @@ infix fun Any.`^`(any: Any): Expr {
     return Expr("$this^{$any}")
 }
 
-infix fun Any.`_`(any: Any): Expr {
-    return Expr("${this}_{$any}")
-}
+infix fun Any.`_`(any: Any) = Expr("${this}_{$any}")
 
-infix fun Any.`=`(any: Any): Expr {
-    return Expr("$this = $any")
-}
+infix fun Any.`=`(any: Any) = Expr("$this = $any")
 
-infix fun Any.less(any: Any): Expr {
-    return Expr("$this < $any")
-}
+infix fun Any.`!=`(any: Any) = Expr("""$this \neq $any""")
+
+infix fun Any.less(any: Any) = Expr("$this < $any")
 
 infix fun Any.leq(any: Any): Expr {
     return Expr("""$this \leq $any""")
