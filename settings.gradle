@@ -1,2 +1,3 @@
 rootProject.name = 'kotex-core'
+include 'example'
 
