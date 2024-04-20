@@ -95,6 +95,15 @@ suspend fun String.asInlineExpr() {
 }
 
 /**
+ * Extension for a int that allows it to be converted to an [LaTeX]
+ * internal expression.
+ */
+@LaTeX
+suspend fun Int.asInlineExpr() {
+    InlineExpression { this.asText() }
+}
+
+/**
  * A mathematical expression within a paragraph.
  *
  * @param content Mathematical expression.
