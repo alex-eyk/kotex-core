@@ -33,6 +33,7 @@ import com.alex.eyk.kotex.latex.math.Matrix
 import com.alex.eyk.kotex.latex.math.Superscript
 import com.alex.eyk.kotex.latex.math.Tilde
 import com.alex.eyk.kotex.latex.math.`_`
+import com.alex.eyk.kotex.latex.math.asInlineExpr
 import com.alex.eyk.kotex.latex.table.TableBuilder
 import com.alex.eyk.kotex.latex.table.asTable
 import com.alex.eyk.kotex.util.plus
@@ -227,7 +228,7 @@ class TransportTaskDocument(
             }
             .expandLeft { i -> InlineMath { "A" `_` (i + 1) } }
             .expandRight { i -> resources[i].asContent() }
-            .expandTop(needsHead(needs))
+            .expandTop(needsHead(listOf(size = needs.size) { it + 1 }))
             .expandBottom(needsTotalBottom(needs))
             .build()
             .asTable()
@@ -335,7 +336,7 @@ class TransportTaskDocument(
         if (j == 0 || j == needs.size + 1) {
             LightGrayCell()
         } else {
-            needs[j - 1]
+            needs[j - 1].asInlineExpr()
         }
     }
 
